@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class TestPage extends StatefulWidget {
@@ -8,6 +9,8 @@ class TestPage extends StatefulWidget {
 }
 
 class _TestPageState extends State<TestPage> {
+  final inputController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +20,16 @@ class _TestPageState extends State<TestPage> {
           color: Colors.blue[800],
           child: Column(
             children: [
-              Text('Second page'),
+              TextField(
+                controller: inputController,
+                decoration: const InputDecoration(
+                  hintText: 'ingridient name',
+                ),
+              ),
+              ElevatedButton(
+                onPressed: sendData,
+                child: Text('Send'),
+              ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -29,5 +41,12 @@ class _TestPageState extends State<TestPage> {
         ),
       ),
     );
+  }
+
+  void sendData() async {
+    String name = inputController.text.trim();
+    Map<String, dynamic> map = {'name': name};
+    await FirebaseFirestore.instance.collection('ingridient').add(map);
+    inputController.clear();
   }
 }

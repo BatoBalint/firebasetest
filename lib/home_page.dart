@@ -23,6 +23,15 @@ class HomePage extends StatelessWidget {
               ),
               onTap: signOut,
             ),
+            ListTile(
+              title: const Text(
+                'Close drawer',
+                style: TextStyle(color: Colors.orange),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         ),
       ),
@@ -31,6 +40,14 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Builder(builder: (context) {
+              return IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: Icon(Icons.menu),
+              );
+            }),
             const Text(
               'Currently logged in as',
               style: TextStyle(color: Colors.grey),
@@ -72,28 +89,7 @@ class HomePage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(PageRouteBuilder(
-                  transitionDuration: Duration(milliseconds: 100),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    // return ScaleTransition(
-                    //   scale: animation,
-                    //   child: child,
-                    //   alignment: Alignment.center,
-                    // );
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: Offset(1, 0),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                          parent: animation, curve: Curves.easeOutQuad)),
-                      child: child,
-                    );
-                  },
-                  pageBuilder: (context, animation, secondaryAnimation) {
-                    return TestPage();
-                  },
-                ));
+                openTestPage(context);
               },
               child: Text('To test page'),
             )
@@ -101,6 +97,31 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void openTestPage(BuildContext context) {
+    getIngridients();
+    Navigator.of(context).push(PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 150),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeInOutQuad)),
+          child: child,
+        );
+      },
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return TestPage();
+      },
+    ));
+  }
+
+  void getIngridients() async {
+    QuerySnapshot<Map<String, dynamic>> ingridients =
+        await FirebaseFirestore.instance.collection('ingridient').get();
   }
 
   void signOut() {
